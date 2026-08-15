@@ -6,7 +6,10 @@ for ($index = 0; $index -lt $args.Count; $index++) {
   if ($args[$index] -eq "--event" -and $index + 1 -lt $args.Count) { $EventName = $args[++$index]; continue }
 }
 if (-not $HostName -or -not $EventName) { throw "IntentRail bootstrap requires --host and --event." }
-$Payload = ($input | Out-String)
+# `$input` is pipeline-scoped and can be empty when a script is launched with
+# `powershell -File` on hosted Windows runners. Console.In preserves redirected
+# Hook stdin consistently across Windows PowerShell and PowerShell Core.
+$Payload = [Console]::In.ReadToEnd()
 
 function Invoke-WithPayload {
   param([string]$Executable, [string[]]$Arguments)
