@@ -2,6 +2,7 @@
 """Run the local pre-commit gate mirrored by CI."""
 
 import argparse
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -23,9 +24,25 @@ IGNORED_SOURCE_PARTS = {
 
 
 def run(command):
-    completed = subprocess.run(command, cwd=ROOT, check=False)
-    if completed.returncode:
-        raise SystemExit(completed.returncode)
+    process = subprocess.Popen(
+        command,
+        cwd=ROOT,
+        text=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        bufsize=1,
+    )
+    output = []
+    for line in process.stdout:
+        print(line, end="")
+        output.append(line)
+    returncode = process.wait()
+    if returncode:
+        if os.environ.get("GITHUB_ACTIONS") == "true":
+            tail = "".join(output[-30:]).strip()
+            escaped = tail.replace("%", "%25").replace("\r", "%0D").replace("\n", "%0A")
+            print("::error title=IntentRail pre-commit gate failed::{0}".format(escaped))
+        raise SystemExit(returncode)
 
 
 def audit_source():
