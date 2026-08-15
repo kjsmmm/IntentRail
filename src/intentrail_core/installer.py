@@ -81,20 +81,29 @@ def resolve_cli_path(explicit=None):
     else:
         candidates = [os.environ.get("INTENTRAIL_CLI"), shutil.which("intentrail")]
         invoked = Path(sys.argv[0]) if sys.argv and sys.argv[0] else None
-        if invoked and invoked.name.lower() in {"intentrail", "intentrail.exe", "intentrail.cmd"}:
+        if invoked and invoked.name.lower() in {"intentrail", "intentrail.exe"}:
             candidates.append(str(invoked))
         scripts = Path(sysconfig.get_path("scripts"))
-        candidates.extend(str(scripts / name) for name in ("intentrail.exe", "intentrail", "intentrail.cmd"))
+        candidates.extend(str(scripts / name) for name in ("intentrail.exe", "intentrail"))
     for candidate in candidates:
         if not candidate:
             continue
         path = Path(candidate).expanduser().resolve()
-        if path.is_file() and not path.name.lower().startswith(("python", "py.exe")):
+        if _is_stable_cli_executable(path):
             return path
     raise InstallationError(
         "A stable IntentRail CLI executable could not be resolved.",
         recovery_actions=["Install with 'uv tool install intentrail' or 'pipx install intentrail', then run 'intentrail install --hosts auto'."],
     )
+
+
+def _is_stable_cli_executable(path):
+    path = Path(path)
+    if not path.is_file() or path.name.lower().startswith(("python", "py.exe")):
+        return False
+    if os.name == "nt" and path.suffix.lower() != ".exe":
+        return False
+    return True
 
 
 def install_or_upgrade(action, hosts, scope, root, cli_path=None, dry_run=False):
@@ -470,8 +479,6 @@ def _installed_hooks_reference_cli(records, cli):
 
 def _run_cli_process(cli, arguments, **kwargs):
     command = [str(cli)] + list(arguments)
-    if os.name == "nt" and Path(cli).suffix.lower() in {".cmd", ".bat"}:
-        command = [os.environ.get("COMSPEC", "cmd.exe"), "/d", "/s", "/c", subprocess.list2cmdline(command)]
     return subprocess.run(command, check=False, **kwargs)
 
 

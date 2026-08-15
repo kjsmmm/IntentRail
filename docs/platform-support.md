@@ -12,6 +12,7 @@ Verified against current public documentation on 2026-08-14.
 ## Adapter behavior
 
 - Managed installations bind Hooks to the absolute uv/pipx `intentrail` CLI path; Hook configuration never invokes a system Python interpreter.
+- Windows managed installations bind only the native `intentrail.exe` launcher and reject command-script locators.
 - Marketplace-direct packages use bundled Bash/PowerShell launchers plus a dependency-free PEP 723 bootstrap and report a degraded state when no valid runtime can be resolved.
 
 - Session and prompt events bind the host session to the selected contract and inject a compact, bounded local-state summary.

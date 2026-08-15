@@ -15,7 +15,7 @@ The installer performs these steps as one owned lifecycle operation:
 
 1. Detect requested or locally available hosts.
 2. Materialize the matching package from the wheel-embedded canonical bundle.
-3. Resolve the absolute managed `intentrail` CLI path and reject Python interpreter paths.
+3. Resolve the absolute managed `intentrail` CLI path and reject Python interpreter paths; Windows managed Hooks require the native `intentrail.exe` launcher produced by uv/pipx and reject `.cmd`, `.bat`, and `.ps1` shims.
 4. Render every managed Hook to `"<absolute-intentrail>" hook --host ... --event ...`.
 5. Atomically install owned files and back up replaced owned content.
 6. Write the install manifest and a small CLI locator for GUI processes with a reduced `PATH`.

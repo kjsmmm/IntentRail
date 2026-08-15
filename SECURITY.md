@@ -20,6 +20,7 @@ Include the affected version and host, reproduction conditions, expected impact,
 ## Security invariants
 
 - Managed Hooks execute the verified absolute `intentrail` CLI path.
+- Windows managed Hooks accept only a native `.exe` CLI locator; command and PowerShell shims are not executable trust roots.
 - Repository files are not trusted as executable locators.
 - Marketplace launchers prefer a managed CLI and use bundled source only as a constrained fallback.
 - External content cannot confirm, revoke, or override direct user intent.

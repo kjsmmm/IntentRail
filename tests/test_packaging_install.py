@@ -4,6 +4,7 @@ import shutil
 import stat
 import subprocess
 import sys
+import sysconfig
 import tempfile
 import unittest
 from pathlib import Path
@@ -129,7 +130,8 @@ class PackagingInstallTests(unittest.TestCase):
             result = build(Path(temporary) / "dist", create_archives=False)
             package = next(item for item in result["packages"] if item["host"] == "codex")
             repo = Path(repo_temp)
-            cli = _managed_cli(repo)
+            cli = _installed_windows_cli()
+            self.assertTrue(cli.is_file(), "editable installation did not create the Windows CLI entry point")
             data_root = repo / "appdata"
             locator = data_root / "IntentRail" / "cli-path.txt"
             locator.parent.mkdir(parents=True)
@@ -146,6 +148,25 @@ class PackagingInstallTests(unittest.TestCase):
             )
             self.assertEqual(completed.returncode, 0, completed.stderr)
             self.assertEqual(json.loads(completed.stdout), {})
+
+            marker = repo / "command-shim-ran"
+            command_shim = repo / "intentrail.cmd"
+            command_shim.write_text('@echo ran>"{0}"\r\n@echo {{}}\r\n'.format(marker), encoding="utf-8")
+            locator.write_text(str(command_shim) + "\n", encoding="utf-8")
+            rejected = subprocess.run(
+                [shutil.which("powershell"), "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", str(script), "hook", "--host", "codex", "--event", "PreToolUse"],
+                input=json.dumps({"session_id": "gui-path", "cwd": str(repo), "tool_name": "Read", "tool_input": {"path": "README.md"}}),
+                text=True,
+                capture_output=True,
+                cwd=repo,
+                timeout=15,
+                env={**os.environ, "PATH": "", "LOCALAPPDATA": str(data_root)},
+            )
+            self.assertEqual(rejected.returncode, 0, rejected.stderr)
+            response = json.loads(rejected.stdout)
+            self.assertEqual(response["hookSpecificOutput"]["permissionDecision"], "deny")
+            self.assertIn("runtime unavailable", response["hookSpecificOutput"]["permissionDecisionReason"])
+            self.assertFalse(marker.exists(), "PowerShell bootstrap executed a command shim locator")
 
     def test_repo_install_writes_absolute_cli_runs_doctor_and_preserves_state(self):
         with tempfile.TemporaryDirectory(dir=str(PROJECT_ROOT)) as build_temp, tempfile.TemporaryDirectory() as repo_temp:
@@ -200,6 +221,15 @@ class PackagingInstallTests(unittest.TestCase):
         with self.assertRaises(InstallationError):
             resolve_cli_path(sys.executable)
 
+    @unittest.skipUnless(os.name == "nt", "Windows executable policy")
+    def test_windows_command_shims_cannot_be_bound_as_the_managed_cli(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            for name in ("intentrail.cmd", "intentrail.bat", "intentrail.ps1"):
+                shim = Path(temporary) / name
+                shim.write_text("@echo off\r\n", encoding="utf-8")
+                with self.subTest(name=name), self.assertRaises(InstallationError):
+                    resolve_cli_path(shim)
+
     def test_installer_stops_on_unowned_collision(self):
         with tempfile.TemporaryDirectory() as repo_temp:
             repo = Path(repo_temp)
@@ -241,10 +271,16 @@ def _managed_cli(directory):
     directory = Path(directory)
     source_cli = PROJECT_ROOT / "skills" / "intentrail" / "scripts" / "intentrail.py"
     if os.name == "nt":
-        path = directory / "intentrail.cmd"
-        path.write_text('@echo off\r\n"{0}" "{1}" %*\r\n'.format(sys.executable, source_cli), encoding="utf-8")
+        return _installed_windows_cli()
     else:
         path = directory / "intentrail"
         path.write_text('#!/bin/sh\nexec "{0}" "{1}" "$@"\n'.format(sys.executable, source_cli), encoding="utf-8")
         path.chmod(path.stat().st_mode | stat.S_IXUSR)
+    return path.resolve()
+
+
+def _installed_windows_cli():
+    path = Path(sysconfig.get_path("scripts")) / "intentrail.exe"
+    if not path.is_file():
+        raise RuntimeError('Windows tests require: python -m pip install -e ".[test]"')
     return path.resolve()

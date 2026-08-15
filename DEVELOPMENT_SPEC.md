@@ -46,7 +46,7 @@ managed Hook 只能调用：
 "<absolute-intentrail-cli>" hook --host HOST --event EVENT
 ```
 
-禁止在正式 Hook JSON 中出现 `python`、`python3` 或 `py -3`。Marketplace 直装包携带 Bash/PowerShell launcher 和无依赖 PEP 723 bootstrap，按“用户级可信 locator/manifest 绝对 CLI → PATH CLI → uv → 合格系统 Python 开发回退 → degraded”探测。仓库内 locator/manifest 不得作为自动执行命令的信任根；repo-scope managed Hook 直接写入安装时验证过的 CLI 绝对路径。系统 Python 只属于最后兼容回退，不得成为 Full 发行前提。
+禁止在正式 Hook JSON 中出现 `python`、`python3` 或 `py -3`。Windows managed Hook 与可信 locator 只接受 uv/pipx 生成的原生 `intentrail.exe`，不得把 `.cmd`、`.bat` 或 `.ps1` 命令脚本作为可执行信任根。Marketplace 直装包携带 Bash/PowerShell launcher 和无依赖 PEP 723 bootstrap，按“用户级可信 locator/manifest 绝对 CLI → PATH CLI → uv → 合格系统 Python 开发回退 → degraded”探测。仓库内 locator/manifest 不得作为自动执行命令的信任根；repo-scope managed Hook 直接写入安装时验证过的 CLI 绝对路径。系统 Python 只属于最后兼容回退，不得成为 Full 发行前提。
 
 ## 1. 文档维护规则
 
@@ -1130,7 +1130,7 @@ V1 可以暂缓：
 
 v0.4 转向实现状态（2026-08-15）：已完成 schema 2.0 状态拆分、事件流事实源声明、原子 reconciliation batch、显式依赖影响传播、`stale/needs_review/revoked` 生命周期、两级 Gate Action Basis、`explain/revert`、v1 备份迁移、Skill 协议更新与开发期回归。宿主真实任务前向测试和相对原生 Goal/Memory 的竞争性基线仍属于阶段 4。
 
-v0.5 发行链修正状态（2026-08-15）：已将安装、升级、卸载和 doctor 并入 managed console CLI，并将运行时唯一源码分离到 `src/intentrail_core/`。正式分发面包含 PyPI CLI、skills.sh 可发现的五个 canonical Skills、由构建器注入 runtime fallback 的宿主 Marketplace 包，以及附带 wheel、sdist、release manifest 和校验和的 GitHub Release。已增加 managed CLI 绝对路径 Hook、可信用户级 locator、PEP 723 bootstrap、Bash/PowerShell launcher、运行时预热和 dormant Hook I/O 验证。`python tools/install.py` 与直接执行 Skill 脚本只保留为开发方式，不再作为正式用户流程。
+v0.5 发行链修正状态（2026-08-15）：已将安装、升级、卸载和 doctor 并入 managed console CLI，并将运行时唯一源码分离到 `src/intentrail_core/`。正式分发面包含 PyPI CLI、skills.sh 可发现的五个 canonical Skills、由构建器注入 runtime fallback 的宿主 Marketplace 包，以及附带 wheel、sdist、release manifest 和校验和的 GitHub Release。已增加 managed CLI 绝对路径 Hook、可信用户级 locator、PEP 723 bootstrap、Bash/PowerShell launcher、运行时预热和 dormant Hook I/O 验证；Windows locator 收紧为原生 `.exe` 并拒绝命令脚本。`python tools/install.py` 与直接执行 Skill 脚本只保留为开发方式，不再作为正式用户流程。
 
 ### 阶段 3：平台适配
 

@@ -22,6 +22,10 @@ First public release candidate.
 - Reproducible host ZIPs, wheel and source distribution builder, machine-readable release manifest, and SHA-256 checksums.
 - GitHub Release automation and a manually approved PyPI Trusted Publishing workflow.
 
+### Changed
+
+- Require the native uv/pipx `intentrail.exe` as the Windows managed CLI trust root, reject command-script locators, and preserve redirected Hook input through the PowerShell Marketplace bootstrap.
+
 ### Security and safety
 
 - Treat external content as untrusted evidence rather than confirmation-capable user intent.

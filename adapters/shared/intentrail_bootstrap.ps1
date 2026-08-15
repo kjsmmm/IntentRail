@@ -17,6 +17,12 @@ function Invoke-WithPayload {
   $script:ChildExitCode = $LASTEXITCODE
 }
 
+function Test-NativeExecutable {
+  param([string]$Executable)
+  if (-not $Executable -or -not (Test-Path -LiteralPath $Executable -PathType Leaf)) { return $false }
+  return [IO.Path]::GetExtension($Executable) -ieq ".exe"
+}
+
 $scriptPath = Join-Path $PSScriptRoot "intentrail_bootstrap.py"
 $locator = $null
 if ($env:LOCALAPPDATA) {
@@ -25,10 +31,10 @@ if ($env:LOCALAPPDATA) {
 }
 if ($locator) {
   $cli = (Get-Content -LiteralPath $locator -TotalCount 1).Trim()
-  if ($cli -and (Test-Path -LiteralPath $cli)) { Invoke-WithPayload $cli @("hook", "--host", $HostName, "--event", $EventName); exit $script:ChildExitCode }
+  if (Test-NativeExecutable $cli) { Invoke-WithPayload $cli @("hook", "--host", $HostName, "--event", $EventName); exit $script:ChildExitCode }
 }
 $managed = Get-Command intentrail -ErrorAction SilentlyContinue
-if ($managed) { Invoke-WithPayload $managed.Source @("hook", "--host", $HostName, "--event", $EventName); exit $script:ChildExitCode }
+if ($managed -and (Test-NativeExecutable $managed.Source)) { Invoke-WithPayload $managed.Source @("hook", "--host", $HostName, "--event", $EventName); exit $script:ChildExitCode }
 $uv = Get-Command uv -ErrorAction SilentlyContinue
 if ($uv) { Invoke-WithPayload $uv.Source @("run", "--quiet", "--script", $scriptPath, "hook", "--host", $HostName, "--event", $EventName); exit $script:ChildExitCode }
 $python = Get-Command python -ErrorAction SilentlyContinue
