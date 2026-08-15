@@ -4,9 +4,9 @@ All notable changes to IntentRail are documented in this file.
 
 The project follows [Semantic Versioning](https://semver.org/).
 
-## [0.5.0] - 2026-08-15
+## [0.5.0] - 2026-08-16
 
-First public release candidate.
+First public release.
 
 ### Added
 
