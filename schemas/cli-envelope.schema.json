@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "cli-envelope.schema.json",
+  "title": "IntentRail CLI JSON output envelope",
+  "type": "object",
+  "required": ["schema_version", "ok", "command", "exit_code", "message", "data", "warnings", "error"],
+  "properties": {
+    "schema_version": {"$ref": "common.schema.json#/$defs/schemaVersion"},
+    "ok": {"type": "boolean"},
+    "command": {"type": "string", "minLength": 1},
+    "exit_code": {"type": "integer", "minimum": 0, "maximum": 12},
+    "message": {"type": "string"},
+    "data": {},
+    "warnings": {"type": "array", "items": {"type": "string"}},
+    "error": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": ["code", "message", "details"],
+          "properties": {
+            "code": {"type": "string", "minLength": 1},
+            "message": {"type": "string", "minLength": 1},
+            "details": {}
+          },
+          "additionalProperties": true
+        },
+        {"type": "null"}
+      ]
+    }
+  },
+  "additionalProperties": true
+}

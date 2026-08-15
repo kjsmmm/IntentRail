@@ -1,0 +1,131 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "common.schema.json",
+  "title": "IntentRail common definitions",
+  "$defs": {
+    "schemaVersion": {
+      "type": "string",
+      "const": "2.0.0"
+    },
+    "uuid": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "intentState": {
+      "type": "string",
+      "enum": ["confirmed", "inferred", "assumed", "conflicted", "superseded", "revoked", "stale", "needs_review"]
+    },
+    "certainty": {
+      "type": "string",
+      "enum": ["confirmed", "inferred", "assumed"]
+    },
+    "lifecycle": {
+      "type": "string",
+      "enum": ["active", "conflicted", "superseded", "revoked", "stale", "needs_review"]
+    },
+    "source": {
+      "type": "object",
+      "required": ["kind"],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": ["user", "agent", "trusted_project_source", "external_untrusted_content", "system"]
+        },
+        "actor_id": {"type": ["string", "null"]}
+      },
+      "additionalProperties": true
+    },
+    "intentItem": {
+      "type": "object",
+      "required": ["id", "kind", "text", "state", "certainty", "lifecycle", "source", "source_ref", "scope", "created_version", "updated_version", "supersedes", "depends_on", "invalidated_by", "tags"],
+      "properties": {
+        "id": {"$ref": "#/$defs/uuid"},
+        "kind": {
+          "type": "string",
+          "enum": ["objective", "deliverable", "constraint", "acceptance_criterion", "decision", "question", "assumption", "completed_work", "preference", "prohibition"]
+        },
+        "text": {"type": "string", "minLength": 1},
+        "state": {"$ref": "#/$defs/intentState"},
+        "certainty": {"$ref": "#/$defs/certainty"},
+        "lifecycle": {"$ref": "#/$defs/lifecycle"},
+        "source": {"$ref": "#/$defs/source"},
+        "source_ref": {"type": "string", "minLength": 1},
+        "scope": {"type": "string", "minLength": 1},
+        "created_version": {"type": "integer", "minimum": 1},
+        "updated_version": {"type": "integer", "minimum": 1},
+        "supersedes": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/uuid"},
+          "uniqueItems": true
+        },
+        "depends_on": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/uuid"},
+          "uniqueItems": true
+        },
+        "invalidated_by": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/uuid"},
+          "uniqueItems": true
+        },
+        "tags": {
+          "type": "array",
+          "items": {"type": "string"},
+          "uniqueItems": true
+        }
+      },
+      "additionalProperties": true
+    },
+    "handoffIntentItem": {
+      "type": "object",
+      "required": ["id", "kind", "text", "state", "certainty", "lifecycle", "scope"],
+      "properties": {
+        "id": {"$ref": "#/$defs/uuid"},
+        "kind": {
+          "type": "string",
+          "enum": ["objective", "deliverable", "constraint", "acceptance_criterion", "decision", "question", "assumption", "completed_work", "preference", "prohibition"]
+        },
+        "text": {"type": "string", "minLength": 1},
+        "state": {"$ref": "#/$defs/intentState"},
+        "certainty": {"$ref": "#/$defs/certainty"},
+        "lifecycle": {"$ref": "#/$defs/lifecycle"},
+        "scope": {"type": "string", "minLength": 1}
+      },
+      "additionalProperties": false
+    },
+    "relativePath": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^(?![A-Za-z]:)(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))(?!.*\\\\).+$"
+    },
+    "evidenceLocator": {
+      "type": "object",
+      "required": ["path", "summary", "verification_status"],
+      "properties": {
+        "path": {"$ref": "#/$defs/relativePath"},
+        "symbol_or_anchor": {"type": ["string", "null"]},
+        "summary": {"type": "string", "minLength": 1, "maxLength": 1000},
+        "source_revision": {"type": ["string", "null"]},
+        "file_digest": {
+          "oneOf": [
+            {"$ref": "#/$defs/sha256"},
+            {"type": "null"}
+          ]
+        },
+        "verification_status": {
+          "type": "string",
+          "enum": ["verified", "unverified", "stale", "missing", "rejected"]
+        }
+      },
+      "additionalProperties": true
+    }
+  }
+}

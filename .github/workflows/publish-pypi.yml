@@ -1,0 +1,43 @@
+name: Publish to PyPI
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Existing reviewed release tag, for example v0.5.0"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/project/intentrail/
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.tag }}
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.13"
+          cache: pip
+      - name: Install build and test dependencies
+        run: python -m pip install -e ".[test]"
+      - name: Verify requested tag and build
+        shell: bash
+        run: |
+          version="$(python -c 'from intentrail_core.constants import PRODUCT_VERSION; print(PRODUCT_VERSION)')"
+          test "${{ inputs.tag }}" = "v${version}"
+          python tools/check.py --release-output build/publish-candidate
+          mkdir -p build/pypi-dist
+          cp build/publish-candidate/*.whl build/pypi-dist/
+          cp build/publish-candidate/*.tar.gz build/pypi-dist/
+      - name: Publish with trusted publishing
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: build/pypi-dist/

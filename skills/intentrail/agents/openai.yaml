@@ -1,0 +1,7 @@
+interface:
+  display_name: "IntentRail"
+  short_description: "Reconcile intent changes and stop stale execution"
+  default_prompt: "Use $intentrail to track my evolving intent and stop stale routes before acting."
+
+policy:
+  allow_implicit_invocation: true

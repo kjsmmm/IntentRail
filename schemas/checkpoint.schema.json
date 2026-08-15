@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "checkpoint.schema.json",
+  "title": "IntentRail semantic checkpoint",
+  "type": "object",
+  "required": ["schema_version", "checkpoint_id", "contract_id", "contract_version", "created_at", "objective", "constraints", "acceptance_criteria", "completed_work", "open_questions", "recent_changes", "next_action", "do_not_repeat", "evidence", "checkpoint_hash"],
+  "properties": {
+    "schema_version": {"$ref": "common.schema.json#/$defs/schemaVersion"},
+    "checkpoint_id": {"$ref": "common.schema.json#/$defs/uuid"},
+    "contract_id": {"$ref": "common.schema.json#/$defs/uuid"},
+    "contract_version": {"type": "integer", "minimum": 1},
+    "created_at": {"$ref": "common.schema.json#/$defs/timestamp"},
+    "objective": {
+      "oneOf": [
+        {"$ref": "common.schema.json#/$defs/intentItem"},
+        {"type": "null"}
+      ]
+    },
+    "constraints": {"type": "array", "items": {"$ref": "common.schema.json#/$defs/intentItem"}},
+    "acceptance_criteria": {"type": "array", "items": {"$ref": "common.schema.json#/$defs/intentItem"}},
+    "completed_work": {"type": "array", "items": {"type": "string"}},
+    "open_questions": {"type": "array", "items": {"$ref": "common.schema.json#/$defs/intentItem"}},
+    "recent_changes": {"type": "array", "items": {"type": "string"}},
+    "next_action": {"type": ["string", "null"]},
+    "do_not_repeat": {"type": "array", "items": {"type": "string"}},
+    "evidence": {"type": "array", "items": {"$ref": "common.schema.json#/$defs/evidenceLocator"}},
+    "checkpoint_hash": {"$ref": "common.schema.json#/$defs/sha256"}
+  },
+  "additionalProperties": true
+}

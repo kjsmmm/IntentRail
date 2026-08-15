@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "config.schema.json",
+  "title": "IntentRail project configuration",
+  "type": "object",
+  "required": ["schema_version", "interaction_mode", "persistence_policy", "sharing_policy", "paused", "turn_lease_ttl_seconds", "action_ticket_ttl_seconds", "precedent_stale_days"],
+  "properties": {
+    "schema_version": {"$ref": "common.schema.json#/$defs/schemaVersion"},
+    "interaction_mode": {"type": "string", "enum": ["quiet", "balanced", "strict"], "default": "balanced"},
+    "activation_mode": {"type": "string", "enum": ["automatic", "explicit-only"], "default": "automatic"},
+    "persistence_policy": {"type": "string", "const": "delayed-auto"},
+    "sharing_policy": {"type": "string", "const": "local-only"},
+    "paused": {"type": "boolean"},
+    "turn_lease_ttl_seconds": {"type": "integer", "minimum": 30, "maximum": 3600, "default": 600},
+    "action_ticket_ttl_seconds": {"type": "integer", "minimum": 30, "maximum": 1800, "default": 300},
+    "precedent_stale_days": {"type": "integer", "minimum": 1, "default": 180},
+    "checkpoint_policy": {
+      "type": "object",
+      "properties": {
+        "before_compaction": {"type": "boolean", "default": true},
+        "before_handoff": {"type": "boolean", "default": true},
+        "before_high_risk_action": {"type": "boolean", "default": true}
+      },
+      "additionalProperties": true
+    },
+    "host_capabilities": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "support_level": {"type": "string", "enum": ["Full", "Standard", "Unsupported"]},
+          "hooks": {"type": "array", "items": {"type": "string"}, "uniqueItems": true}
+        },
+        "additionalProperties": true
+      }
+    }
+  },
+  "additionalProperties": true
+}

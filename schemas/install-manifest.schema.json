@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://intentrail.dev/schemas/install-manifest.schema.json",
+  "title": "IntentRail managed runtime installation manifest",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "owner",
+    "product_version",
+    "scope",
+    "root",
+    "hosts",
+    "cli_path",
+    "runtime_backend",
+    "installed",
+    "configs",
+    "updated_at"
+  ],
+  "properties": {
+    "schema_version": {"const": "1.0.0"},
+    "owner": {"const": "intentrail-owned"},
+    "product_version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
+    "scope": {"enum": ["repo", "user"]},
+    "root": {"type": "string", "minLength": 1},
+    "hosts": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"enum": ["codex", "claude-code", "copilot-cli", "generic-agent-skills"]}
+    },
+    "cli_path": {"type": "string", "minLength": 1},
+    "runtime_backend": {"const": "managed-cli"},
+    "installed": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["host", "path", "hash", "marker"],
+        "properties": {
+          "host": {"enum": ["codex", "claude-code", "copilot-cli", "generic-agent-skills"]},
+          "path": {"type": "string", "minLength": 1},
+          "hash": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+          "marker": {"type": "string", "minLength": 1}
+        },
+        "additionalProperties": false
+      }
+    },
+    "configs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["host", "kind", "path", "value"],
+        "properties": {
+          "host": {"enum": ["codex", "claude-code", "copilot-cli"]},
+          "kind": {"enum": ["codex-marketplace", "copilot-hooks"]},
+          "path": {"type": "string", "minLength": 1},
+          "value": {"type": "string"}
+        },
+        "additionalProperties": false
+      }
+    },
+    "last_backup": {"type": ["string", "null"]},
+    "updated_at": {"type": "string", "format": "date-time"},
+    "doctor": {"type": "object"}
+  },
+  "additionalProperties": false
+}

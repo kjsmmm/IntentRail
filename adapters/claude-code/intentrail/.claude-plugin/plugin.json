@@ -1,0 +1,11 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
+  "name": "intentrail",
+  "version": "0.5.0",
+  "description": "Keep long-running agent work aligned with the user's latest intent.",
+  "author": {"name": "IntentRail contributors"},
+  "license": "MIT",
+  "keywords": ["intent-alignment", "long-context", "agent-skills", "lic"],
+  "skills": "./skills/",
+  "hooks": "./hooks/hooks.json"
+}

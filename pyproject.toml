@@ -1,0 +1,45 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "build_backend"
+backend-path = ["."]
+
+[project]
+name = "intentrail"
+version = "0.5.0"
+description = "Evolving-intent reconciliation and stale-route control for agent work"
+readme = "README.md"
+requires-python = ">=3.11,<4"
+license = "MIT"
+authors = [{name = "IntentRail contributors"}]
+keywords = ["agent-skills", "intent-alignment", "long-context", "multi-turn", "llm-agents"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
+  "Topic :: Software Development :: Libraries :: Application Frameworks",
+]
+dependencies = []
+
+[project.urls]
+Homepage = "https://github.com/kjsmmm/IntentRail"
+Repository = "https://github.com/kjsmmm/IntentRail.git"
+Issues = "https://github.com/kjsmmm/IntentRail/issues"
+Changelog = "https://github.com/kjsmmm/IntentRail/blob/main/CHANGELOG.md"
+
+[project.optional-dependencies]
+test = ["build>=1.2", "jsonschema>=4.18", "setuptools>=77"]
+
+[project.scripts]
+intentrail = "intentrail_core.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["intentrail_core*"]
+
+[tool.setuptools.package-data]
+"*" = ["*.json"]

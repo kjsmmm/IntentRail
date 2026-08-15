@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "contract.schema.json",
+  "title": "IntentRail current-intent materialized projection",
+  "type": "object",
+  "required": ["schema_version", "contract_id", "project_id", "version", "status", "created_at", "updated_at", "objective", "deliverables", "constraints", "acceptance_criteria", "decisions", "questions", "assumptions", "completed_work", "superseded_items", "current_stage", "next_material_action", "last_event_id", "event_head_hash"],
+  "properties": {
+    "schema_version": {"$ref": "common.schema.json#/$defs/schemaVersion"},
+    "contract_id": {"$ref": "common.schema.json#/$defs/uuid"},
+    "project_id": {"$ref": "common.schema.json#/$defs/uuid"},
+    "title": {"type": "string", "minLength": 1},
+    "status": {"type": "string", "enum": ["active", "paused", "completed", "archived", "recovery-required"]},
+    "version": {"type": "integer", "minimum": 1},
+    "objective": {
+      "oneOf": [
+        {"$ref": "common.schema.json#/$defs/intentItem"},
+        {"type": "null"}
+      ]
+    },
+    "deliverables": {"type": "array", "items": {"$ref": "common.schema.json#/$defs/intentItem"}},
+    "constraints": {"type": "array", "items": {"$ref": "common.schema.json#/$defs/intentItem"}},
+    "acceptance_criteria": {"type": "array", "items": {"$ref": "common.schema.json#/$defs/intentItem"}},
+    "decisions": {"type": "array", "items": {"$ref": "common.schema.json#/$defs/intentItem"}},
+    "questions": {"type": "array", "items": {"$ref": "common.schema.json#/$defs/intentItem"}},
+    "assumptions": {"type": "array", "items": {"$ref": "common.schema.json#/$defs/intentItem"}},
+    "completed_work": {"type": "array", "items": {"$ref": "common.schema.json#/$defs/intentItem"}},
+    "superseded_items": {"type": "array", "items": {"$ref": "common.schema.json#/$defs/intentItem"}},
+    "current_stage": {"type": ["string", "null"]},
+    "next_material_action": {"type": ["string", "null"]},
+    "created_at": {"$ref": "common.schema.json#/$defs/timestamp"},
+    "updated_at": {"$ref": "common.schema.json#/$defs/timestamp"},
+    "last_event_id": {
+      "oneOf": [
+        {"$ref": "common.schema.json#/$defs/uuid"},
+        {"type": "null"}
+      ]
+    },
+    "event_head_hash": {
+      "oneOf": [
+        {"$ref": "common.schema.json#/$defs/sha256"},
+        {"type": "null"}
+      ]
+    }
+  },
+  "additionalProperties": true
+}

@@ -1,0 +1,7 @@
+interface:
+  display_name: "IntentRail Resume"
+  short_description: "Resume work from validated task state"
+  default_prompt: "Use $intentrail-resume to continue from saved task state."
+
+policy:
+  allow_implicit_invocation: false

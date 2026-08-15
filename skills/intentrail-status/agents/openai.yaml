@@ -1,0 +1,7 @@
+interface:
+  display_name: "IntentRail Status"
+  short_description: "Show active intent, stale items, and recent changes"
+  default_prompt: "Use $intentrail-status to show the current task state."
+
+policy:
+  allow_implicit_invocation: false

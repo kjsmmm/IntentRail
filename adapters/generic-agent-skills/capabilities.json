@@ -1,0 +1,9 @@
+{
+  "host": "generic-agent-skills",
+  "support_level": "Standard",
+  "skills": true,
+  "automatic_discovery": "host-dependent",
+  "lifecycle_hooks": false,
+  "deterministic_pre_tool_gate": false,
+  "notes": "The canonical Skill Suite works without a host adapter; lifecycle automation depends on the client."
+}

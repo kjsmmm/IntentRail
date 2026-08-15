@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "handoff.schema.json",
+  "title": "IntentRail sanitized handoff package",
+  "type": "object",
+  "required": ["schema_version", "handoff_id", "created_at", "source_project_id", "source_contract_id", "source_contract_version", "source_revision", "objective", "constraints", "acceptance_criteria", "decisions", "completed_work", "open_questions", "next_action", "do_not_repeat", "evidence", "redaction", "package_digest"],
+  "properties": {
+    "schema_version": {"$ref": "common.schema.json#/$defs/schemaVersion"},
+    "handoff_id": {"$ref": "common.schema.json#/$defs/uuid"},
+    "created_at": {"$ref": "common.schema.json#/$defs/timestamp"},
+    "source_project_id": {"$ref": "common.schema.json#/$defs/uuid"},
+    "source_contract_id": {"$ref": "common.schema.json#/$defs/uuid"},
+    "source_contract_version": {"type": "integer", "minimum": 1},
+    "source_revision": {"type": ["string", "null"]},
+    "objective": {
+      "oneOf": [
+        {"$ref": "common.schema.json#/$defs/handoffIntentItem"},
+        {"type": "null"}
+      ]
+    },
+    "constraints": {"type": "array", "items": {"$ref": "common.schema.json#/$defs/handoffIntentItem"}},
+    "acceptance_criteria": {"type": "array", "items": {"$ref": "common.schema.json#/$defs/handoffIntentItem"}},
+    "decisions": {"type": "array", "items": {"$ref": "common.schema.json#/$defs/handoffIntentItem"}},
+    "completed_work": {"type": "array", "items": {"type": "string", "maxLength": 1000}},
+    "open_questions": {"type": "array", "items": {"$ref": "common.schema.json#/$defs/handoffIntentItem"}},
+    "next_action": {"type": ["string", "null"], "maxLength": 1000},
+    "do_not_repeat": {"type": "array", "items": {"type": "string", "maxLength": 1000}},
+    "evidence": {"type": "array", "items": {"$ref": "common.schema.json#/$defs/evidenceLocator"}},
+    "redaction": {
+      "type": "object",
+      "required": ["profile", "scanner_version", "excluded_categories", "reviewed_by_user"],
+      "properties": {
+        "profile": {"type": "string", "enum": ["C1", "C2"]},
+        "scanner_version": {"type": "string", "minLength": 1},
+        "excluded_categories": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+        "reviewed_by_user": {"type": "boolean"}
+      },
+      "additionalProperties": false
+    },
+    "package_digest": {"$ref": "common.schema.json#/$defs/sha256"}
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,24 @@
+{
+  "name": "intentrail",
+  "version": "0.5.0",
+  "description": "Keep long-running agent work aligned with the user's latest intent.",
+  "author": {
+    "name": "IntentRail contributors"
+  },
+  "license": "MIT",
+  "keywords": ["intent-alignment", "long-context", "agent-skills", "lic"],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "IntentRail",
+    "shortDescription": "Keep long-running work aligned with current intent.",
+    "longDescription": "Reconcile evolving intent, invalidate stale routes, checkpoint before compaction, and gate unsupported side effects.",
+    "developerName": "IntentRail contributors",
+    "category": "Productivity",
+    "capabilities": ["Read", "Write"],
+    "defaultPrompt": [
+      "Track this multi-stage task with IntentRail.",
+      "Show the current IntentRail task contract.",
+      "Verify this result against my latest requirements."
+    ]
+  }
+}

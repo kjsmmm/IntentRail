@@ -1,0 +1,17 @@
+{
+  "$schema": "https://skills.sh/schemas/skills.sh.schema.json",
+  "notGrouped": "bottom",
+  "groupings": [
+    {
+      "title": "Intent alignment",
+      "description": "Track evolving intent, recover task state, and verify work against the latest active requirements.",
+      "skills": [
+        "intentrail",
+        "intentrail-status",
+        "intentrail-checkpoint",
+        "intentrail-resume",
+        "intentrail-verify"
+      ]
+    }
+  ]
+}

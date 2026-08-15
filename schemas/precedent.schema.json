@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "precedent.schema.json",
+  "title": "IntentRail confirmed precedents",
+  "type": "object",
+  "required": ["schema_version", "project_id", "updated_at", "items"],
+  "properties": {
+    "schema_version": {"$ref": "common.schema.json#/$defs/schemaVersion"},
+    "project_id": {"$ref": "common.schema.json#/$defs/uuid"},
+    "updated_at": {"$ref": "common.schema.json#/$defs/timestamp"},
+    "items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "text", "scope", "source_ref", "confirmed_at", "last_used_at", "status"],
+        "properties": {
+          "id": {"$ref": "common.schema.json#/$defs/uuid"},
+          "text": {"type": "string", "minLength": 1},
+          "scope": {"type": "string", "minLength": 1},
+          "source_ref": {"type": "string", "minLength": 1},
+          "confirmed_at": {"$ref": "common.schema.json#/$defs/timestamp"},
+          "last_used_at": {
+            "oneOf": [
+              {"$ref": "common.schema.json#/$defs/timestamp"},
+              {"type": "null"}
+            ]
+          },
+          "status": {"type": "string", "enum": ["active", "stale", "revoked"]}
+        },
+        "additionalProperties": true
+      }
+    }
+  },
+  "additionalProperties": true
+}

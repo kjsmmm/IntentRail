@@ -1,0 +1,30 @@
+{
+  "product": "IntentRail",
+  "plugin_name": "intentrail",
+  "product_version": "0.5.0",
+  "schema_compatibility": {"minimum": "2.0.0", "maximum_major": 2},
+  "python": {"minimum": "3.11", "dependencies": "standard-library-only", "formal_runtime": "uv-or-pipx-managed-cli"},
+  "source_layout": {
+    "runtime": "src/intentrail_core",
+    "skills": "skills",
+    "host_adapters": "adapters",
+    "generated_output": "dist"
+  },
+  "distribution_channels": ["pypi", "skills.sh", "native-marketplace", "github-release"],
+  "runtime_resolution": ["install-locator", "path-cli", "uv-pep723", "compatible-system-python-development-fallback", "degraded"],
+  "canonical_skills": [
+    "intentrail",
+    "intentrail-status",
+    "intentrail-checkpoint",
+    "intentrail-resume",
+    "intentrail-verify"
+  ],
+  "hosts": {
+    "codex": {"adapter": "adapters/codex/intentrail", "target": "Full", "manifest": ".codex-plugin/plugin.json"},
+    "claude-code": {"adapter": "adapters/claude-code/intentrail", "target": "Full", "manifest": ".claude-plugin/plugin.json"},
+    "copilot-cli": {"adapter": "adapters/copilot/intentrail", "target": "Full", "manifest": "plugin.json"},
+    "generic-agent-skills": {"adapter": "adapters/generic-agent-skills", "target": "Standard", "manifest": "capabilities.json"}
+  },
+  "owned_marker": "intentrail-owned",
+  "state_directory": ".intentrail"
+}

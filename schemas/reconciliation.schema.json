@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "reconciliation.schema.json",
+  "title": "IntentRail atomic reconciliation proposal",
+  "type": "object",
+  "required": ["base_version", "idempotency_key", "source", "source_ref", "changes"],
+  "properties": {
+    "contract_id": {"$ref": "common.schema.json#/$defs/uuid"},
+    "reconciliation_id": {"$ref": "common.schema.json#/$defs/uuid"},
+    "base_version": {"type": "integer", "minimum": 1},
+    "idempotency_key": {"type": "string", "minLength": 1},
+    "source": {"$ref": "common.schema.json#/$defs/source"},
+    "source_ref": {"type": "string", "minLength": 1},
+    "changes": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["operation"],
+        "properties": {
+          "operation": {"type": "string", "enum": ["ADD", "MODIFY", "REVOKE", "CONFIRM", "CONFLICT", "DEFER", "RESOLVE"]},
+          "entity_kind": {"type": "string"},
+          "entity_id": {"type": "string"},
+          "target_id": {"type": "string"},
+          "after": {}
+        },
+        "additionalProperties": true
+      }
+    },
+    "unresolved": {"type": "array", "items": {"type": "object"}}
+  },
+  "additionalProperties": false
+}

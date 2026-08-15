@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "project-index.schema.json",
+  "title": "IntentRail project index",
+  "type": "object",
+  "required": ["schema_version", "project_id", "created_at", "updated_at", "contracts"],
+  "properties": {
+    "schema_version": {"$ref": "common.schema.json#/$defs/schemaVersion"},
+    "project_id": {"$ref": "common.schema.json#/$defs/uuid"},
+    "created_at": {"$ref": "common.schema.json#/$defs/timestamp"},
+    "updated_at": {"$ref": "common.schema.json#/$defs/timestamp"},
+    "contracts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["contract_id", "title", "status", "version", "updated_at"],
+        "properties": {
+          "contract_id": {"$ref": "common.schema.json#/$defs/uuid"},
+          "title": {"type": "string", "minLength": 1},
+          "status": {"type": "string", "enum": ["active", "paused", "completed", "archived", "recovery-required"]},
+          "version": {"type": "integer", "minimum": 1},
+          "updated_at": {"$ref": "common.schema.json#/$defs/timestamp"}
+        },
+        "additionalProperties": true
+      }
+    }
+  },
+  "additionalProperties": true
+}

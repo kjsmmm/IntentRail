@@ -1,0 +1,11 @@
+include build_backend.py
+include pyproject.toml
+include README.md
+include LICENSE
+include CHANGELOG.md
+include distribution/canonical.json
+recursive-include src *.py *.json
+recursive-include skills *.md *.py *.yaml
+recursive-include adapters *.json *.py *.sh *.ps1
+recursive-include schemas *.json
+recursive-include tools *.py

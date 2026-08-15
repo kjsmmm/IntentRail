@@ -1,0 +1,7 @@
+interface:
+  display_name: "IntentRail Checkpoint"
+  short_description: "Save a recovery checkpoint or sanitized handoff"
+  default_prompt: "Use $intentrail-checkpoint to save the current task state."
+
+policy:
+  allow_implicit_invocation: false

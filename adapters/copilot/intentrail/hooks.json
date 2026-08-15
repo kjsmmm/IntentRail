@@ -1,0 +1,9 @@
+{
+  "version": 1,
+  "hooks": {
+    "sessionStart": [{"type": "command", "bash": "{{INTENTRAIL_COMMAND_UNIX}} hook --host copilot-cli --event SessionStart", "powershell": "{{INTENTRAIL_COMMAND_WINDOWS}} hook --host copilot-cli --event SessionStart", "timeoutSec": 5}],
+    "userPromptSubmitted": [{"type": "command", "bash": "{{INTENTRAIL_COMMAND_UNIX}} hook --host copilot-cli --event UserPromptSubmit", "powershell": "{{INTENTRAIL_COMMAND_WINDOWS}} hook --host copilot-cli --event UserPromptSubmit", "timeoutSec": 5}],
+    "preToolUse": [{"type": "command", "matcher": "*", "bash": "{{INTENTRAIL_COMMAND_UNIX}} hook --host copilot-cli --event PreToolUse", "powershell": "{{INTENTRAIL_COMMAND_WINDOWS}} hook --host copilot-cli --event PreToolUse", "timeoutSec": 5}],
+    "sessionEnd": [{"type": "command", "bash": "{{INTENTRAIL_COMMAND_UNIX}} hook --host copilot-cli --event SessionEnd", "powershell": "{{INTENTRAIL_COMMAND_WINDOWS}} hook --host copilot-cli --event SessionEnd", "timeoutSec": 3}]
+  }
+}

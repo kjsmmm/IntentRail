@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "event.schema.json",
+  "title": "IntentRail append-only event",
+  "type": "object",
+  "required": ["schema_version", "event_id", "contract_id", "sequence", "timestamp", "operation", "entity_kind", "entity_id", "before", "after", "source", "source_ref", "intent_state", "contract_version_before", "contract_version_after", "reversible", "inverse_of", "idempotency_key", "previous_hash", "reconciliation_id", "reconciliation_index", "reconciliation_size", "event_hash"],
+  "properties": {
+    "schema_version": {"$ref": "common.schema.json#/$defs/schemaVersion"},
+    "event_id": {"$ref": "common.schema.json#/$defs/uuid"},
+    "contract_id": {"$ref": "common.schema.json#/$defs/uuid"},
+    "sequence": {"type": "integer", "minimum": 1},
+    "timestamp": {"$ref": "common.schema.json#/$defs/timestamp"},
+    "operation": {"type": "string", "enum": ["ADD", "MODIFY", "REVOKE", "CONFIRM", "CONFLICT", "DEFER", "RESOLVE", "PROGRESS", "CHECKPOINT", "UNDO", "PAUSE", "RESUME", "VERIFY_PASS", "VERIFY_FAIL", "COMPLETE", "ARCHIVE", "MIGRATE"]},
+    "entity_kind": {"type": "string", "minLength": 1},
+    "entity_id": {"type": ["string", "null"]},
+    "before": {},
+    "after": {},
+    "source": {"$ref": "common.schema.json#/$defs/source"},
+    "source_ref": {"type": "string", "minLength": 1},
+    "intent_state": {
+      "oneOf": [
+        {"$ref": "common.schema.json#/$defs/intentState"},
+        {"type": "null"}
+      ]
+    },
+    "contract_version_before": {"type": "integer", "minimum": 0},
+    "contract_version_after": {"type": "integer", "minimum": 1},
+    "reversible": {"type": "boolean"},
+    "inverse_of": {
+      "oneOf": [
+        {"$ref": "common.schema.json#/$defs/uuid"},
+        {"type": "null"}
+      ]
+    },
+    "idempotency_key": {"type": "string", "minLength": 1},
+    "previous_hash": {
+      "oneOf": [
+        {"$ref": "common.schema.json#/$defs/sha256"},
+        {"type": "null"}
+      ]
+    },
+    "reconciliation_id": {
+      "oneOf": [{"$ref": "common.schema.json#/$defs/uuid"}, {"type": "null"}]
+    },
+    "reconciliation_index": {"type": ["integer", "null"], "minimum": 1},
+    "reconciliation_size": {"type": ["integer", "null"], "minimum": 1},
+    "event_hash": {"$ref": "common.schema.json#/$defs/sha256"}
+  },
+  "additionalProperties": true
+}

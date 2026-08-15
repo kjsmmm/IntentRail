@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "binding.schema.json",
+  "title": "IntentRail host context binding",
+  "type": "object",
+  "required": ["schema_version", "binding_id", "host", "context_id", "contract_id", "created_at", "updated_at"],
+  "properties": {
+    "schema_version": {"$ref": "common.schema.json#/$defs/schemaVersion"},
+    "binding_id": {"$ref": "common.schema.json#/$defs/uuid"},
+    "host": {"type": "string", "enum": ["codex", "claude-code", "copilot-cli", "generic-agent-skills"]},
+    "context_id": {"type": "string", "minLength": 1},
+    "contract_id": {"$ref": "common.schema.json#/$defs/uuid"},
+    "created_at": {"$ref": "common.schema.json#/$defs/timestamp"},
+    "updated_at": {"$ref": "common.schema.json#/$defs/timestamp"}
+  },
+  "additionalProperties": true
+}
