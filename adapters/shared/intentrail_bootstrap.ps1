@@ -11,10 +11,51 @@ if (-not $HostName -or -not $EventName) { throw "IntentRail bootstrap requires -
 # Hook stdin consistently across Windows PowerShell and PowerShell Core.
 $Payload = [Console]::In.ReadToEnd()
 
+function ConvertTo-NativeArgument {
+  param([AllowEmptyString()][string]$Value)
+  if ($Value.Length -gt 0 -and $Value -notmatch '[\s"]') { return $Value }
+  $builder = New-Object System.Text.StringBuilder
+  [void]$builder.Append('"')
+  $backslashes = 0
+  foreach ($character in $Value.ToCharArray()) {
+    if ($character -eq [char]92) { $backslashes++; continue }
+    if ($character -eq [char]34) {
+      if ($backslashes) { [void]$builder.Append((([string][char]92) * (($backslashes * 2) + 1))) }
+      else { [void]$builder.Append([char]92) }
+      [void]$builder.Append('"')
+      $backslashes = 0
+      continue
+    }
+    if ($backslashes) { [void]$builder.Append((([string][char]92) * $backslashes)); $backslashes = 0 }
+    [void]$builder.Append($character)
+  }
+  if ($backslashes) { [void]$builder.Append((([string][char]92) * ($backslashes * 2))) }
+  [void]$builder.Append('"')
+  return $builder.ToString()
+}
+
 function Invoke-WithPayload {
   param([string]$Executable, [string[]]$Arguments)
-  if ($Payload) { $Payload | & $Executable @Arguments } else { & $Executable @Arguments }
-  $script:ChildExitCode = $LASTEXITCODE
+  $start = New-Object System.Diagnostics.ProcessStartInfo
+  $start.FileName = $Executable
+  $start.Arguments = (($Arguments | ForEach-Object { ConvertTo-NativeArgument ([string]$_) }) -join " ")
+  $start.UseShellExecute = $false
+  $start.CreateNoWindow = $true
+  $start.RedirectStandardInput = $true
+  $process = New-Object System.Diagnostics.Process
+  $process.StartInfo = $start
+  try {
+    [void]$process.Start()
+    if ($Payload.Length -gt 0) {
+      $bytes = [Text.Encoding]::UTF8.GetBytes($Payload)
+      $process.StandardInput.BaseStream.Write($bytes, 0, $bytes.Length)
+    }
+    $process.StandardInput.BaseStream.Close()
+    $process.WaitForExit()
+    $script:ChildExitCode = $process.ExitCode
+  } finally {
+    $process.Dispose()
+  }
 }
 
 function Test-NativeExecutable {

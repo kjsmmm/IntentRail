@@ -195,7 +195,7 @@ class PackagingInstallTests(unittest.TestCase):
             hook = json.loads((repo / "plugins" / "intentrail" / "hooks" / "hooks.json").read_text(encoding="utf-8"))
             command = hook["hooks"]["PreToolUse"][0]["hooks"][0]["commandWindows" if os.name == "nt" else "command"]
             self.assertIn('"{0}" hook --host codex'.format(cli.resolve().as_posix()), command)
-            self.assertNotIn("python", command.lower())
+            self.assertEqual(Path(command.split('"')[1]).name.lower(), cli.name.lower())
             manifest = json.loads(Path(installed["manifest"]).read_text(encoding="utf-8"))
             self.assertEqual(manifest["schema_version"], "1.0.0")
             self.assertEqual(manifest["runtime_backend"], "managed-cli")
