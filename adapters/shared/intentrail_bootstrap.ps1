@@ -6,61 +6,12 @@ for ($index = 0; $index -lt $args.Count; $index++) {
   if ($args[$index] -eq "--event" -and $index + 1 -lt $args.Count) { $EventName = $args[++$index]; continue }
 }
 if (-not $HostName -or -not $EventName) { throw "IntentRail bootstrap requires --host and --event." }
-# PowerShell's `$input` and Console.In can both be detached from redirected
-# stdin in non-interactive hosts. Read the operating-system handle as bytes so
-# Hook JSON survives hosted runners and Unicode is never transcoded.
-$payloadStream = New-Object System.IO.MemoryStream
-try {
-  [Console]::OpenStandardInput().CopyTo($payloadStream)
-  [byte[]]$PayloadBytes = $payloadStream.ToArray()
-} finally {
-  $payloadStream.Dispose()
-}
-
-function ConvertTo-NativeArgument {
-  param([AllowEmptyString()][string]$Value)
-  if ($Value.Length -gt 0 -and $Value -notmatch '[\s"]') { return $Value }
-  $builder = New-Object System.Text.StringBuilder
-  [void]$builder.Append('"')
-  $backslashes = 0
-  foreach ($character in $Value.ToCharArray()) {
-    if ($character -eq [char]92) { $backslashes++; continue }
-    if ($character -eq [char]34) {
-      if ($backslashes) { [void]$builder.Append((([string][char]92) * (($backslashes * 2) + 1))) }
-      else { [void]$builder.Append([char]92) }
-      [void]$builder.Append('"')
-      $backslashes = 0
-      continue
-    }
-    if ($backslashes) { [void]$builder.Append((([string][char]92) * $backslashes)); $backslashes = 0 }
-    [void]$builder.Append($character)
-  }
-  if ($backslashes) { [void]$builder.Append((([string][char]92) * ($backslashes * 2))) }
-  [void]$builder.Append('"')
-  return $builder.ToString()
-}
-
 function Invoke-WithPayload {
   param([string]$Executable, [string[]]$Arguments)
-  $start = New-Object System.Diagnostics.ProcessStartInfo
-  $start.FileName = $Executable
-  $start.Arguments = (($Arguments | ForEach-Object { ConvertTo-NativeArgument ([string]$_) }) -join " ")
-  $start.UseShellExecute = $false
-  $start.CreateNoWindow = $true
-  $start.RedirectStandardInput = $true
-  $process = New-Object System.Diagnostics.Process
-  $process.StartInfo = $start
-  try {
-    [void]$process.Start()
-    if ($PayloadBytes.Length -gt 0) {
-      $process.StandardInput.BaseStream.Write($PayloadBytes, 0, $PayloadBytes.Length)
-    }
-    $process.StandardInput.BaseStream.Close()
-    $process.WaitForExit()
-    $script:ChildExitCode = $process.ExitCode
-  } finally {
-    $process.Dispose()
-  }
+  # Never read, pipe, cache, or redirect Hook stdin here. PowerShell's native
+  # invocation preserves the original handle for the managed CLI or fallback.
+  & $Executable @Arguments
+  $script:ChildExitCode = $LASTEXITCODE
 }
 
 function Test-NativeExecutable {

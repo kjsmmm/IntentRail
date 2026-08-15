@@ -137,17 +137,20 @@ class PackagingInstallTests(unittest.TestCase):
             locator.parent.mkdir(parents=True)
             locator.write_text(str(cli) + "\n", encoding="utf-8")
             script = Path(package["directory"]) / "scripts" / "intentrail_bootstrap.ps1"
+            payload = json.dumps(
+                {"session_id": "gui-path", "cwd": str(repo), "tool_name": "Read", "tool_input": {"path": "意图-README.md"}},
+                ensure_ascii=False,
+            ).encode("utf-8")
             completed = subprocess.run(
                 [shutil.which("powershell"), "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", str(script), "hook", "--host", "codex", "--event", "PreToolUse"],
-                input=json.dumps({"session_id": "gui-path", "cwd": str(repo), "tool_name": "Read", "tool_input": {"path": "README.md"}}),
-                text=True,
+                input=payload,
                 capture_output=True,
                 cwd=repo,
                 timeout=15,
                 env={**os.environ, "PATH": "", "LOCALAPPDATA": str(data_root)},
             )
-            self.assertEqual(completed.returncode, 0, completed.stderr)
-            self.assertEqual(json.loads(completed.stdout), {})
+            self.assertEqual(completed.returncode, 0, completed.stderr.decode("utf-8", errors="replace"))
+            self.assertEqual(json.loads(completed.stdout.decode("utf-8")), {})
 
             marker = repo / "command-shim-ran"
             command_shim = repo / "intentrail.cmd"
@@ -155,15 +158,14 @@ class PackagingInstallTests(unittest.TestCase):
             locator.write_text(str(command_shim) + "\n", encoding="utf-8")
             rejected = subprocess.run(
                 [shutil.which("powershell"), "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", str(script), "hook", "--host", "codex", "--event", "PreToolUse"],
-                input=json.dumps({"session_id": "gui-path", "cwd": str(repo), "tool_name": "Read", "tool_input": {"path": "README.md"}}),
-                text=True,
+                input=payload,
                 capture_output=True,
                 cwd=repo,
                 timeout=15,
                 env={**os.environ, "PATH": "", "LOCALAPPDATA": str(data_root)},
             )
-            self.assertEqual(rejected.returncode, 0, rejected.stderr)
-            response = json.loads(rejected.stdout)
+            self.assertEqual(rejected.returncode, 0, rejected.stderr.decode("utf-8", errors="replace"))
+            response = json.loads(rejected.stdout.decode("utf-8"))
             self.assertEqual(response["hookSpecificOutput"]["permissionDecision"], "deny")
             self.assertIn("runtime unavailable", response["hookSpecificOutput"]["permissionDecisionReason"])
             self.assertFalse(marker.exists(), "PowerShell bootstrap executed a command shim locator")
