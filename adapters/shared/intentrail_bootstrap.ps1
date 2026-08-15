@@ -6,10 +6,16 @@ for ($index = 0; $index -lt $args.Count; $index++) {
   if ($args[$index] -eq "--event" -and $index + 1 -lt $args.Count) { $EventName = $args[++$index]; continue }
 }
 if (-not $HostName -or -not $EventName) { throw "IntentRail bootstrap requires --host and --event." }
-# `$input` is pipeline-scoped and can be empty when a script is launched with
-# `powershell -File` on hosted Windows runners. Console.In preserves redirected
-# Hook stdin consistently across Windows PowerShell and PowerShell Core.
-$Payload = [Console]::In.ReadToEnd()
+# PowerShell's `$input` and Console.In can both be detached from redirected
+# stdin in non-interactive hosts. Read the operating-system handle as bytes so
+# Hook JSON survives hosted runners and Unicode is never transcoded.
+$payloadStream = New-Object System.IO.MemoryStream
+try {
+  [Console]::OpenStandardInput().CopyTo($payloadStream)
+  [byte[]]$PayloadBytes = $payloadStream.ToArray()
+} finally {
+  $payloadStream.Dispose()
+}
 
 function ConvertTo-NativeArgument {
   param([AllowEmptyString()][string]$Value)
@@ -46,9 +52,8 @@ function Invoke-WithPayload {
   $process.StartInfo = $start
   try {
     [void]$process.Start()
-    if ($Payload.Length -gt 0) {
-      $bytes = [Text.Encoding]::UTF8.GetBytes($Payload)
-      $process.StandardInput.BaseStream.Write($bytes, 0, $bytes.Length)
+    if ($PayloadBytes.Length -gt 0) {
+      $process.StandardInput.BaseStream.Write($PayloadBytes, 0, $PayloadBytes.Length)
     }
     $process.StandardInput.BaseStream.Close()
     $process.WaitForExit()
